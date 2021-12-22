@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -102,13 +103,39 @@ public class BasicItemController {
      * Item 저장 V4
      * @return
      */
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV4(Item item) {
         //, Model model
         //@ModelAttribute 자체를 생략 가능하다.
 
         itemRepository.save(item);
         return "basic/item";
+
+    }
+
+    /**
+     * Item 저장 V5
+     * @return
+     */
+    //@PostMapping("/add")
+    public String addItemV5(Item item) {
+        itemRepository.save(item);
+        return "redirect:/basic/items/" + item.getId();
+    }
+
+    /**
+     * Item 저장 V6
+     * @return
+     */
+    @PostMapping("/add")
+    public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
+        //, Model model
+
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+
+        return "redirect:/basic/items/{itemId}";
     }
 
     /**
@@ -119,7 +146,7 @@ public class BasicItemController {
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "basic/editForm";
+        return "redirect:/basic/items/" + item.getId();
     }
 
     /**
